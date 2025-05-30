@@ -1,4 +1,5 @@
-import scipy
+# import scipy
+import math
 import numexpr
 
 
@@ -6,8 +7,8 @@ class constants:
 
     @classmethod
     def __getitem__(self, key):
-        if hasattr(scipy.constants, key):
-            return getattr(scipy.constants, key)
+        if hasattr(math, key):
+            return getattr(math, key)
         else:
             raise ValueError(f"scipy.constants module has no constant named '{key}'")
 
