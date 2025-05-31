@@ -1,3 +1,5 @@
 google-adk
 numexpr
 scipy
+pint
+periodictable

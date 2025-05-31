@@ -1,52 +1,24 @@
-# import scipy
-import math
-import numexpr
+from tutor_agent.common_tools import evaluate_expression
+
+import numpy as np
 
 
-class constants:
-
-    @classmethod
-    def __getitem__(self, key):
-        if hasattr(math, key):
-            return getattr(math, key)
-        else:
-            raise ValueError(f"scipy.constants module has no constant named '{key}'")
-
-
-def evaluate_expression(expression: str):
+def solve_polynomial(coefficients):
     """
-    Evaluates a mathematical expression using numexpr.
-    Only provide valid mathematical expressions.
-    For constants, it uses scipy.constants so you can use constants like 'pi', 'e', etc. in expression.
+    This tool solves an nth-order single-variable polynomial equation numerically.
 
     Args:
-        expression (str): The mathematical expression to evaluate.
+        coefficients (list): Polynomial coefficients in descending order of powers.
+                             E.g., [1, 0, -2, 1] corresponds to x^3 - 2x + 1 = 0
 
     Returns:
-        The result of the evaluated expression.
-    Example:
-        "37593 * 67" for "37593 times 67"
-        "37593**(1/5)" for "37593^(1/5)"
-        "pi * 2" for "pi times 2"
-    Raises:
-        ValueError: If the expression is not a string or contains invalid characters.
+        numpy.ndarray: Array of roots (may include complex numbers)
     """
-    # Ensure the expression is a string and strip any leading/trailing whitespace
-    if not isinstance(expression, str):
-        raise ValueError("Expression must be a string.")
 
-    expression = expression.strip()
+    # Use numpy.roots to compute all roots
+    roots = np.roots(coefficients)
 
-    # Evaluate the expression using numexpr with restricted globals and custom constants
-    try:
-        ans = numexpr.evaluate(
-            expression.strip(),
-            global_dict={},  # restrict access to globals
-            local_dict=constants(),  # add common mathematical constants
-        )
-        return str(ans)
-    except Exception as e:
-        return f"Error evaluating expression: {repr(e)}"
+    return str(roots)
 
 
 def get_tools():
