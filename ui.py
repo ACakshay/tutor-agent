@@ -43,36 +43,3 @@ async def chat_page():
         raise HTTPException(
             status_code=500, detail=f"Error loading chat page: {str(e)}"
         )
-
-
-# Example of how to integrate this into your main FastAPI app:
-"""
-from fastapi import FastAPI
-from your_existing_routers import your_existing_router
-from this_file import ui_router
-
-app = FastAPI()
-
-# Include your existing API routes
-app.include_router(your_existing_router)
-
-# Include the UI routes
-app.include_router(ui_router)
-
-# Or alternatively, use the static file approach:
-# setup_static_files(app)
-"""
-
-# CORS middleware setup (add this to your main app if needed)
-"""
-from fastapi.middleware.cors import CORSMiddleware
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure this properly for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-"""

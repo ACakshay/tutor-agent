@@ -9,9 +9,10 @@ try:
     app = get_fast_api_app(agents_dir=".", web=False)
 except Exception as e:
     print(repr(e))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure properly for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
