@@ -5,3 +5,4 @@ pint
 periodictable
 duckduckgo_search
 jinja2
+mysql-connector-python
