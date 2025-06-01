@@ -169,12 +169,31 @@
                     body: JSON.stringify({})
                 });
                 
+                let shouldRedirect = false;
+                let errorDetail = '';
                 if (response.ok) {
-                    // Redirect to chat interface
+                    shouldRedirect = true;
+                } else {
+                    try {
+                        const errorData = await response.json();
+                        if (
+                            response.status === 400 &&
+                            errorData.detail &&
+                            errorData.detail.startsWith('Session already exists')
+                        ) {
+                            shouldRedirect = true;
+                        } else {
+                            errorDetail = errorData.detail || 'Unknown error';
+                        }
+                    } catch {
+                        errorDetail = 'Unknown error';
+                    }
+                }
+
+                if (shouldRedirect) {
                     window.location.href = `/chat?user=${encodeURIComponent(userName)}&session=${encodeURIComponent(sessionId)}`;
                 } else {
-                    const errorData = await response.json();
-                    showAlert(`Error creating session: ${errorData.detail || 'Unknown error'}`, 'danger');
+                    showAlert(`Error creating session: ${errorDetail}`, 'danger');
                 }
             } catch (error) {
                 showAlert(`Error: ${error.message}`, 'danger');

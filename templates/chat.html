@@ -285,7 +285,172 @@
             
             document.getElementById('userName').textContent = currentUser;
             document.getElementById('sessionName').textContent = `Session: ${currentSession}`;
+            
+            // Load existing session events
+            loadSessionEvents();
         });
+        
+        // Load existing session events
+        async function loadSessionEvents() {
+            try {
+                showTypingIndicator(true);
+                
+                const response = await fetch(`/apps/tutor_agent/users/${encodeURIComponent(currentUser)}/sessions/${encodeURIComponent(currentSession)}`, {
+                    method: 'GET',
+                    headers: {
+                        'accept': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    const sessionData = await response.json();
+                    if (sessionData.events && sessionData.events.length > 0) {
+                        // Remove welcome message
+                        const welcomeMessage = document.getElementById('chatMessages').querySelector('.welcome-message');
+                        if (welcomeMessage) {
+                            welcomeMessage.remove();
+                        }
+                        
+                        // Process and display existing events
+                        processSessionEvents(sessionData.events);
+                    }
+                } else if (response.status === 404) {
+                    // Session doesn't exist, create a new one
+                    await createNewSession();
+                } else {
+                    console.error('Error loading session:', response.status);
+                    showErrorMessage('Failed to load session history');
+                }
+            } catch (error) {
+                console.error('Error loading session events:', error);
+                showErrorMessage('Failed to connect to server');
+            } finally {
+                showTypingIndicator(false);
+            }
+        }
+        
+        // Create new session if it doesn't exist
+        async function createNewSession() {
+            try {
+                const response = await fetch(`/apps/tutor_agent/users/${encodeURIComponent(currentUser)}/sessions/${encodeURIComponent(currentSession)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create session');
+                }
+                
+                console.log('New session created successfully');
+            } catch (error) {
+                console.error('Error creating session:', error);
+                showErrorMessage('Failed to create new session');
+            }
+        }
+        
+        // Process and display session events
+        function processSessionEvents(events) {
+            events.forEach(event => {
+                if (event.content && event.content.parts) {
+                    const isUserMessage = event.content.role === 'user';
+                    const isAssistantMessage = event.content.role === 'model';
+                    
+                    if (isUserMessage) {
+                        // Display user message
+                        const userText = extractTextFromParts(event.content.parts);
+                        if (userText) {
+                            addMessageFromHistory(userText, 'user', event.timestamp);
+                        }
+                    } else if (isAssistantMessage) {
+                        // Display assistant message
+                        const assistantText = extractAssistantMessageFromEvent(event);
+                        if (assistantText) {
+                            addMessageFromHistory(assistantText, 'assistant', event.timestamp);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Extract text from message parts
+        function extractTextFromParts(parts) {
+            for (let part of parts) {
+                if (part.text) {
+                    return part.text;
+                }
+            }
+            return '';
+        }
+        
+        // Extract assistant message from a single event
+        function extractAssistantMessageFromEvent(event) {
+            let messages = [];
+            
+            if (event.content && event.content.parts) {
+                for (let part of event.content.parts) {
+                    // Handle function calls
+                    if (part.functionCall) {
+                        const functionName = part.functionCall.name;
+                        const query = part.functionCall.args ? 
+                            (part.functionCall.args.query || JSON.stringify(part.functionCall.args)) : 
+                            'No arguments';
+                        messages.push(`🔍 ${functionName}: ${query}`);
+                    }
+                    // Handle function responses
+                    else if (part.functionResponse) {
+                        const functionName = part.functionResponse.name;
+                        const result = part.functionResponse.response?.result || JSON.stringify(part.functionResponse.response);
+                        messages.push(`📊 ${functionName}: ${result}`);
+                    }
+                    // Handle text content
+                    else if (part.text) {
+                        messages.push(part.text);
+                    }
+                }
+            }
+            
+            return messages.length > 0 ? messages.join('\n\n') : '';
+        }
+        
+        // Add message from history with timestamp
+        function addMessageFromHistory(content, sender, timestamp) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            // Format content with proper styling for function calls and responses
+            const formattedContent = formatMessageContent(content);
+            
+            // Format timestamp
+            const messageTime = timestamp ? new Date(timestamp * 1000).toLocaleTimeString() : new Date().toLocaleTimeString();
+            
+            messageContent.innerHTML = `
+                <div>${formattedContent}</div>
+                <div class="message-time">${messageTime}</div>
+            `;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Show error message in chat
+        function showErrorMessage(message) {
+            addMessage(`Error: ${message}`, 'assistant', true);
+        }
         
         // Handle message submission
         document.getElementById('messageForm').addEventListener('submit', async function(e) {
