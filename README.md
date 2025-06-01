@@ -38,7 +38,7 @@ Tutor Agent is an AI-powered web application designed to assist students in subj
 
 3. Run the agent:
     ```bash
-    uvicorn main:app --host=0.0.0.0 --port=8000
+    uv run uvicorn main:app --host=0.0.0.0 --port=8000
     ```
 4. Access the agent:
    Open your web browser and go to `http://localhost:8000/` to interact
