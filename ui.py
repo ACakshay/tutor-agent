@@ -1,0 +1,78 @@
+from fastapi import APIRouter, Request, HTTPException
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import os
+from pathlib import Path
+
+# Create router for UI endpoints
+ui_router = APIRouter()
+
+
+BASE_DIR = Path(__file__).resolve().parent
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+
+@ui_router.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    """
+    Serve the main index page for user setup using Jinja2 template
+    """
+    html_path = TEMPLATES_DIR / "index.html"
+    if html_path.exists():
+        return templates.TemplateResponse("index.html", {"request": request})
+    else:
+        raise HTTPException(status_code=404, detail="index.html not found")
+
+
+@ui_router.get("/chat", response_class=HTMLResponse)
+async def chat_page():
+    """
+    Serve the chat interface page
+    """
+    try:
+        html_path = TEMPLATES_DIR / "chat.html"
+        if html_path.exists():
+            with open(html_path, "r", encoding="utf-8") as f:
+                html_content = f.read()
+            return HTMLResponse(content=html_content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error loading chat page: {str(e)}"
+        )
+
+
+# Example of how to integrate this into your main FastAPI app:
+"""
+from fastapi import FastAPI
+from your_existing_routers import your_existing_router
+from this_file import ui_router
+
+app = FastAPI()
+
+# Include your existing API routes
+app.include_router(your_existing_router)
+
+# Include the UI routes
+app.include_router(ui_router)
+
+# Or alternatively, use the static file approach:
+# setup_static_files(app)
+"""
+
+# CORS middleware setup (add this to your main app if needed)
+"""
+from fastapi.middleware.cors import CORSMiddleware
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure this properly for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+"""

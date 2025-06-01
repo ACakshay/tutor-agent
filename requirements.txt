@@ -4,3 +4,4 @@ scipy
 pint
 periodictable
 duckduckgo_search
+jinja2
