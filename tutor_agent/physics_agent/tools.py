@@ -5,7 +5,7 @@ import pint
 from pint import UnitRegistry
 
 
-def convert_units_general(value, from_unit, to_unit):
+def convert_units_general(value: float, from_unit: str, to_unit: str):
     """
     A general-purpose unit conversion function covering a wide range of categories.
 
@@ -36,7 +36,7 @@ def convert_units_general(value, from_unit, to_unit):
         # Convert to the target unit
         converted_quantity = quantity.to(to_unit)
 
-        return converted_quantity.magnitude
+        return str(converted_quantity.magnitude)
     except pint.errors.UndefinedUnitError as e:
         raise ValueError(
             f"Undefined unit error: {e}. Check if '{from_unit}' or '{to_unit}' is a valid unit."

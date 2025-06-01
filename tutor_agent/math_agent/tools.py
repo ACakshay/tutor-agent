@@ -2,24 +2,27 @@ from tutor_agent.common_tools import evaluate_expression
 
 import numpy as np
 
+import numpy as np
 
-def solve_polynomial(coefficients):
+
+def solve_polynomial(coefficients: list[float]) -> str:
     """
-    This tool solves an nth-order single-variable polynomial equation numerically.
+    Solves an nth-order single-variable polynomial equation from list of coefficients.
 
     Args:
-        coefficients (list): Polynomial coefficients in descending order of powers.
-                             E.g., [1, 0, -2, 1] corresponds to x^3 - 2x + 1 = 0
+        coefficients (list): list of coefficients in descending order of powers.
 
     Returns:
-        numpy.ndarray: Array of roots (may include complex numbers)
+        str: String representation of the polynomial roots
     """
+    # Convert to floats for numpy
+    coefficients = [float(c) for c in coefficients]
 
-    # Use numpy.roots to compute all roots
+    # Compute roots
     roots = np.roots(coefficients)
 
     return str(roots)
 
 
 def get_tools():
-    return [evaluate_expression]
+    return [solve_polynomial, evaluate_expression]

@@ -1,1 +1,1 @@
-from .agent import math_agent
+from .agent import chemistry_agent

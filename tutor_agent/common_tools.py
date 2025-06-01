@@ -1,6 +1,6 @@
-import math
 import numexpr
 import scipy.constants as sc_constants
+from duckduckgo_search import DDGS
 
 
 class constants:
@@ -49,3 +49,32 @@ def evaluate_expression(expression: str):
         return str(ans)
     except Exception as e:
         return f"Error evaluating expression: {repr(e)}"
+
+
+def search_internet(query: str):
+    """
+    Use this tool to search the internet for a given query.
+    Args:
+        query (str): The search query.
+
+    Returns:
+        A string containing the search results.
+    Raises:
+        ValueError: If the query is not a string or is empty.
+    """
+    if not isinstance(query, str) or not query.strip():
+        raise ValueError("Query must be a non-empty string.")
+
+    results = []
+
+    with DDGS() as ddgs:
+        dgs_gen = ddgs.text(
+            query,
+            max_results=5,
+        )
+        for result in dgs_gen:
+            results.append(result["body"])
+
+    # Here you would implement the actual internet search logic
+    # For now, we return a placeholder response
+    return f"\n".join(results) if results else "No results found for the query."

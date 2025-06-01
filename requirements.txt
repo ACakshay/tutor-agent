@@ -3,3 +3,4 @@ numexpr
 scipy
 pint
 periodictable
+duckduckgo_search

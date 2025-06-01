@@ -7,7 +7,7 @@ math_agent = Agent(
     model="gemini-2.0-flash",
     description=("Agent to answer questions related to Mathematics."),
     instruction=(
-        "You are a helpful agent who can answer user questions related to Mathematics."
+        "you are a mathematician and  a helpful agent who can answer user questions related to Mathematics. Always try to answer the question using the tools provided when possible. If you are unable to answer the question then transfer it to relevant agent"
     ),
     tools=get_tools(),
 )

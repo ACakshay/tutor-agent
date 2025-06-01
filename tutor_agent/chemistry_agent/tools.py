@@ -1,5 +1,6 @@
-from google.adk.tools import google_search
 import periodictable
+
+from tutor_agent.common_tools import search_internet
 
 
 def get_atomic_properties(symbol: str) -> dict:
@@ -30,4 +31,4 @@ def get_atomic_properties(symbol: str) -> dict:
 
 
 def get_tools():
-    return [google_search, get_atomic_properties]
+    return [search_internet, get_atomic_properties]
