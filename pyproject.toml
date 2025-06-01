@@ -5,6 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "duckduckgo-search>=8.0.2",
     "google-adk>=1.1.1",
+    "jinja2>=3.1.6",
     "numexpr>=2.10.2",
+    "periodictable>=2.0.2",
+    "pint>=0.24.4",
+    "scipy>=1.15.3",
 ]
